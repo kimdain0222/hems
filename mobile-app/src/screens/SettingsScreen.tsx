@@ -10,10 +10,10 @@ import {
   TextInput,
   Dimensions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MdPerson, MdEdit, MdClose, MdFlashOn, MdDeviceHub, MdGroup, MdPsychology, MdShare, MdAnalytics, MdCampaign, MdRefresh, MdLogout, MdDeleteForever } from 'react-icons/md';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import MockDataService, { UserProfile } from '../data/MockDataService';
 
 const { width } = Dimensions.get('window');
@@ -129,7 +129,7 @@ export const SettingsScreen: React.FC = () => {
           <Card.Content>
             <View style={styles.profileHeader}>
               <View style={styles.avatarContainer}>
-                <Icon name="person" size={40} color="white" />
+                <MdPerson size={40} color="white" />
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{userProfile.name}</Text>
@@ -140,7 +140,11 @@ export const SettingsScreen: React.FC = () => {
                 style={styles.editButton}
                 onPress={() => setIsEditing(!isEditing)}
               >
-                <Icon name={isEditing ? "close" : "edit"} size={20} color="#667eea" />
+                {isEditing ? (
+                  <MdClose size={20} color="#667eea" />
+                ) : (
+                  <MdEdit size={20} color="#667eea" />
+                )}
               </TouchableOpacity>
             </View>
 
@@ -209,7 +213,7 @@ export const SettingsScreen: React.FC = () => {
             <Title>알림 설정</Title>
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="flash-on" size={24} color="#FF9800" />
+                <MdFlashOn size={24} color="#FF9800" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>에너지 알림</Text>
                   <Text style={styles.settingDescription}>전력 사용량 급증 시 알림</Text>
@@ -225,7 +229,7 @@ export const SettingsScreen: React.FC = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="device-hub" size={24} color="#2196F3" />
+                <MdDeviceHub size={24} color="#2196F3" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>디바이스 상태</Text>
                   <Text style={styles.settingDescription}>디바이스 연결 상태 변경 알림</Text>
@@ -241,7 +245,7 @@ export const SettingsScreen: React.FC = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="group" size={24} color="#9C27B0" />
+                <MdGroup size={24} color="#9C27B0" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>커뮤니티 업데이트</Text>
                   <Text style={styles.settingDescription}>랭킹 및 챌린지 업데이트</Text>
@@ -257,7 +261,7 @@ export const SettingsScreen: React.FC = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="psychology" size={24} color="#4CAF50" />
+                <MdPsychology size={24} color="#4CAF50" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>AI 추천</Text>
                   <Text style={styles.settingDescription}>AI 최적화 제안 알림</Text>
@@ -281,7 +285,7 @@ export const SettingsScreen: React.FC = () => {
             <Title>개인정보 보호</Title>
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="share" size={24} color="#FF5722" />
+                <MdShare size={24} color="#FF5722" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>데이터 공유</Text>
                   <Text style={styles.settingDescription}>익명화된 데이터 연구용 공유</Text>
@@ -297,7 +301,7 @@ export const SettingsScreen: React.FC = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="analytics" size={24} color="#607D8B" />
+                <MdAnalytics size={24} color="#607D8B" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>사용 분석</Text>
                   <Text style={styles.settingDescription}>앱 사용 패턴 분석</Text>
@@ -313,7 +317,7 @@ export const SettingsScreen: React.FC = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Icon name="campaign" size={24} color="#E91E63" />
+                <MdCampaign size={24} color="#E91E63" />
                 <View style={styles.settingText}>
                   <Text style={styles.settingTitle}>마케팅</Text>
                   <Text style={styles.settingDescription}>관련 제품 및 서비스 안내</Text>
@@ -360,7 +364,7 @@ export const SettingsScreen: React.FC = () => {
               style={styles.demoButton}
               onPress={handleDemoReset}
             >
-              <Icon name="refresh" size={20} color="#F57C00" />
+              <MdRefresh size={20} color="#F57C00" />
               <Text style={styles.demoButtonText}>데모 데이터 리셋</Text>
             </TouchableOpacity>
           </Card.Content>
@@ -376,7 +380,7 @@ export const SettingsScreen: React.FC = () => {
               style={styles.actionButton}
               onPress={handleLogout}
             >
-              <Icon name="logout" size={20} color="#F44336" />
+              <MdLogout size={20} color="#F44336" />
               <Text style={[styles.actionButtonText, { color: '#F44336' }]}>로그아웃</Text>
             </TouchableOpacity>
             
@@ -384,7 +388,7 @@ export const SettingsScreen: React.FC = () => {
               style={styles.actionButton}
               onPress={handleDeleteAccount}
             >
-              <Icon name="delete-forever" size={20} color="#F44336" />
+              <MdDeleteForever size={20} color="#F44336" />
               <Text style={[styles.actionButtonText, { color: '#F44336' }]}>계정 삭제</Text>
             </TouchableOpacity>
           </Card.Content>
@@ -429,13 +433,7 @@ const styles = StyleSheet.create({
   profileCard: {
     margin: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   profileHeader: {
@@ -513,13 +511,7 @@ const styles = StyleSheet.create({
     margin: 16,
     marginTop: 0,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   settingItem: {

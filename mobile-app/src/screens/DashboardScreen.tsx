@@ -10,12 +10,14 @@ import {
   Alert,
 } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
-import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MdTrendingDown, MdEco, MdReceipt, MdPlayArrow } from 'react-icons/md';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import CircularProgress from 'react-native-circular-progress';
 import MockDataService, { EnergyData } from '../data/MockDataService';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+
 
 const { width } = Dimensions.get('window');
 
@@ -126,7 +128,7 @@ export const DashboardScreen: React.FC = () => {
             ]
           )}
         >
-          <Icon name="play-arrow" size={20} color="white" />
+          <MdPlayArrow size={20} color="white" />
           <Text style={styles.demoButtonText}>데모</Text>
         </TouchableOpacity>
       </View>
@@ -154,7 +156,7 @@ export const DashboardScreen: React.FC = () => {
         <View style={styles.metricsRow}>
           <Card style={[styles.metricCard, { backgroundColor: '#4CAF50' }]}>
             <Card.Content style={styles.metricContent}>
-              <Icon name="trending-down" size={24} color="white" />
+              <MdTrendingDown size={24} color="white" />
               <Text style={styles.metricValue}>{energyData.todaySavings.toFixed(1)}</Text>
               <Text style={styles.metricUnit}>kWh</Text>
               <Text style={styles.metricLabel}>오늘 절약량</Text>
@@ -163,7 +165,7 @@ export const DashboardScreen: React.FC = () => {
 
           <Card style={[styles.metricCard, { backgroundColor: '#2196F3' }]}>
             <Card.Content style={styles.metricContent}>
-              <Icon name="eco" size={24} color="white" />
+              <MdEco size={24} color="white" />
               <Text style={styles.metricValue}>{energyData.co2Reduction.toFixed(1)}</Text>
               <Text style={styles.metricUnit}>kg</Text>
               <Text style={styles.metricLabel}>CO2 절감량</Text>
@@ -172,13 +174,13 @@ export const DashboardScreen: React.FC = () => {
         </View>
       </Animatable.View>
 
-      {/* 에너지 효율 등급 */}
-      <Animatable.View animation="fadeInUp" duration={800} delay={400}>
+{/* 에너지 효율 등급 */}
+<Animatable.View animation="fadeInUp" duration={800} delay={400}>
         <Card style={styles.gradeCard}>
           <Card.Content>
             <Title>에너지 효율 등급</Title>
             <View style={styles.gradeContainer}>
-              <CircularProgress
+              <AnimatedCircularProgress
                 size={80}
                 width={8}
                 fill={getEfficiencyScore(energyData.efficiencyGrade)}
@@ -192,7 +194,7 @@ export const DashboardScreen: React.FC = () => {
                     {energyData.efficiencyGrade}
                   </Text>
                 )}
-              </CircularProgress>
+              </AnimatedCircularProgress>
               <View style={styles.gradeInfo}>
                 <Text style={styles.gradeDescription}>
                   {energyData.efficiencyGrade === 'A+' ? '매우 우수' :
@@ -213,7 +215,7 @@ export const DashboardScreen: React.FC = () => {
         <Card style={styles.chartCard}>
           <Card.Content>
             <Title>24시간 사용량</Title>
-            <LineChart
+            {/* <LineChart
               data={{
                 labels: energyData.hourlyUsage.map(item => `${item.hour}시`).filter((_, index) => index % 4 === 0),
                 datasets: [{
@@ -242,7 +244,11 @@ export const DashboardScreen: React.FC = () => {
               }}
               bezier
               style={styles.chart}
-            />
+            /> */}
+            <View style={styles.chartPlaceholder}>
+              <Text style={styles.chartPlaceholderText}>24시간 사용량 차트</Text>
+              <Text style={styles.chartPlaceholderSubtext}>차트 데이터 로딩 중...</Text>
+            </View>
           </Card.Content>
         </Card>
       </Animatable.View>
@@ -252,7 +258,7 @@ export const DashboardScreen: React.FC = () => {
         <Card style={styles.chartCard}>
           <Card.Content>
             <Title>월별 절약 추이</Title>
-            <BarChart
+            {/* <BarChart
               data={{
                 labels: energyData.monthlyTrend.map(item => item.month),
                 datasets: [{
@@ -273,7 +279,11 @@ export const DashboardScreen: React.FC = () => {
                 }
               }}
               style={styles.chart}
-            />
+            /> */}
+            <View style={styles.chartPlaceholder}>
+              <Text style={styles.chartPlaceholderText}>월별 절약 추이 차트</Text>
+              <Text style={styles.chartPlaceholderSubtext}>차트 데이터 로딩 중...</Text>
+            </View>
           </Card.Content>
         </Card>
       </Animatable.View>
@@ -283,13 +293,13 @@ export const DashboardScreen: React.FC = () => {
         <Card style={styles.billCard}>
           <Card.Content>
             <View style={styles.billContainer}>
-              <Icon name="receipt" size={32} color="#FF9800" />
+                <MdReceipt size={32} color="#FF9800" />
               <View style={styles.billInfo}>
                 <Text style={styles.billLabel}>예상 전기요금</Text>
                 <Text style={styles.billValue}>{energyData.estimatedBill.toLocaleString()}원</Text>
               </View>
               <View style={styles.billTrend}>
-                <Icon name="trending-down" size={20} color="#4CAF50" />
+                <MdTrendingDown size={20} color="#4CAF50" />
                 <Text style={styles.billTrendText}>-5.2%</Text>
               </View>
             </View>
@@ -352,13 +362,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
     elevation: 8,
   },
   mainMetric: {
@@ -407,13 +411,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   metricContent: {
@@ -441,13 +439,7 @@ const styles = StyleSheet.create({
   gradeCard: {
     margin: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   gradeContainer: {
@@ -475,13 +467,7 @@ const styles = StyleSheet.create({
   chartCard: {
     margin: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   chart: {
@@ -491,13 +477,7 @@ const styles = StyleSheet.create({
   billCard: {
     margin: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   billContainer: {
@@ -544,6 +524,24 @@ const styles = StyleSheet.create({
   },
   updateText: {
     fontSize: 12,
+    color: '#666',
+  },
+  chartPlaceholder: {
+    height: 220,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 16,
+    marginVertical: 8,
+  },
+  chartPlaceholderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#667eea',
+    marginBottom: 8,
+  },
+  chartPlaceholderSubtext: {
+    fontSize: 14,
     color: '#666',
   },
 });

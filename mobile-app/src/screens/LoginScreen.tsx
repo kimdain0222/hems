@@ -11,8 +11,8 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdEco } from 'react-icons/md';
 import * as Animatable from 'react-native-animatable';
 
 const { width, height } = Dimensions.get('window');
@@ -41,11 +41,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       
       // 데모용 로그인 (실제로는 MockDataService 사용)
       if (email === 'demo@hems.com' && password === 'demo123') {
+        console.log('Login successful, calling onLoginSuccess');
         onLoginSuccess('demo_token_12345');
       } else {
         Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (error) {
+      console.error('Login error:', error);
       Alert.alert('오류', '로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
@@ -74,7 +76,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             style={styles.logoContainer}
           >
             <View style={styles.logo}>
-              <Icon name="eco" size={60} color="white" />
+              <MdEco size={60} color="white" />
             </View>
             <Text style={styles.title}>HEMS</Text>
             <Text style={styles.subtitle}>Home Energy Management System</Text>
@@ -91,7 +93,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             style={styles.formContainer}
           >
             <View style={styles.inputContainer}>
-              <Icon name="email" size={20} color="#666" style={styles.inputIcon} />
+              <MdEmail size={20} color="#666" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="이메일"
@@ -105,7 +107,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
             </View>
 
             <View style={styles.inputContainer}>
-              <Icon name="lock" size={20} color="#666" style={styles.inputIcon} />
+              <MdLock size={20} color="#666" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="비밀번호"
@@ -120,11 +122,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 style={styles.eyeIcon}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Icon 
-                  name={showPassword ? "visibility" : "visibility-off"} 
-                  size={20} 
-                  color="#666" 
-                />
+                {showPassword ? (
+                  <MdVisibility size={20} color="#666" />
+                ) : (
+                  <MdVisibilityOff size={20} color="#666" />
+                )}
               </TouchableOpacity>
             </View>
 
@@ -229,13 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 30,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.25)',
     elevation: 10,
   },
   inputContainer: {

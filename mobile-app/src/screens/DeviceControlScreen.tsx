@@ -9,10 +9,10 @@ import {
   Switch,
   Dimensions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MdPowerOff, MdEco, MdSchedule, MdFlashOn, MdAcUnit, MdPower, MdWbSunny, MdBatteryFull, MdDeviceHub } from 'react-icons/md';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
 import MockDataService, { DeviceData } from '../data/MockDataService';
 
 const { width } = Dimensions.get('window');
@@ -60,12 +60,12 @@ export const DeviceControlScreen: React.FC = () => {
 
   const getDeviceIcon = (type: string) => {
     switch (type) {
-      case 'smart_meter': return 'flash-on';
-      case 'thermostat': return 'ac-unit';
-      case 'smart_plug': return 'power';
-      case 'solar_panel': return 'wb-sunny';
-      case 'battery': return 'battery-full';
-      default: return 'device-hub';
+      case 'smart_meter': return <MdFlashOn size={24} color="white" />;
+      case 'thermostat': return <MdAcUnit size={24} color="white" />;
+      case 'smart_plug': return <MdPower size={24} color="white" />;
+      case 'solar_panel': return <MdWbSunny size={24} color="white" />;
+      case 'battery': return <MdBatteryFull size={24} color="white" />;
+      default: return <MdDeviceHub size={24} color="white" />;
     }
   };
 
@@ -153,7 +153,7 @@ export const DeviceControlScreen: React.FC = () => {
             style={[styles.quickActionButton, { backgroundColor: '#F44336' }]}
             onPress={() => handleQuickAction('all_off')}
           >
-            <Icon name="power-off" size={24} color="white" />
+            <MdPowerOff size={24} color="white" />
             <Text style={styles.quickActionText}>전체 끄기</Text>
           </TouchableOpacity>
 
@@ -161,7 +161,7 @@ export const DeviceControlScreen: React.FC = () => {
             style={[styles.quickActionButton, { backgroundColor: '#4CAF50' }]}
             onPress={() => handleQuickAction('eco_mode')}
           >
-            <Icon name="eco" size={24} color="white" />
+            <MdEco size={24} color="white" />
             <Text style={styles.quickActionText}>에코 모드</Text>
           </TouchableOpacity>
 
@@ -169,7 +169,7 @@ export const DeviceControlScreen: React.FC = () => {
             style={[styles.quickActionButton, { backgroundColor: '#2196F3' }]}
             onPress={() => handleQuickAction('schedule')}
           >
-            <Icon name="schedule" size={24} color="white" />
+            <MdSchedule size={24} color="white" />
             <Text style={styles.quickActionText}>스케줄</Text>
           </TouchableOpacity>
         </View>
@@ -192,11 +192,7 @@ export const DeviceControlScreen: React.FC = () => {
                       styles.deviceIcon,
                       { backgroundColor: getDeviceColor(device.type, device.status) }
                     ]}>
-                      <Icon 
-                        name={getDeviceIcon(device.type)} 
-                        size={24} 
-                        color="white" 
-                      />
+                      {getDeviceIcon(device.type)}
                     </View>
                     <View style={styles.deviceDetails}>
                       <Text style={styles.deviceName}>{device.name}</Text>
@@ -369,13 +365,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginHorizontal: 4,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   quickActionText: {
@@ -390,13 +380,7 @@ const styles = StyleSheet.create({
   deviceCard: {
     marginBottom: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   deviceHeader: {
@@ -485,13 +469,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     margin: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 4,
   },
   summaryContent: {

@@ -9,8 +9,8 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import LinearGradient from 'react-native-linear-gradient';
+import { MdDashboard, MdDeviceHub, MdSettings, MdEco } from 'react-icons/md';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 
 // Screens
@@ -36,7 +36,7 @@ const LoadingScreen: React.FC = () => (
       iterationCount="infinite"
       style={styles.loadingContent}
     >
-      <Icon name="eco" size={80} color="white" />
+      <MdEco size={80} color="white" />
       <Text style={styles.loadingTitle}>HEMS</Text>
       <Text style={styles.loadingSubtitle}>Home Energy Management System</Text>
       <Animatable.View
@@ -55,23 +55,16 @@ const MainTabNavigator: React.FC = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
-        let iconName: string;
-
         switch (route.name) {
           case 'Dashboard':
-            iconName = 'dashboard';
-            break;
+            return <MdDashboard size={size} color={color} />;
           case 'Devices':
-            iconName = 'device-hub';
-            break;
+            return <MdDeviceHub size={size} color={color} />;
           case 'Settings':
-            iconName = 'settings';
-            break;
+            return <MdSettings size={size} color={color} />;
           default:
-            iconName = 'help';
+            return <MdSettings size={size} color={color} />;
         }
-
-        return <Icon name={iconName} size={size} color={color} />;
       },
       tabBarActiveTintColor: '#667eea',
       tabBarInactiveTintColor: '#999',
@@ -90,7 +83,6 @@ const MainTabNavigator: React.FC = () => (
       headerStyle: {
         backgroundColor: '#667eea',
         elevation: 0,
-        shadowOpacity: 0,
       },
       headerTintColor: 'white',
       headerTitleStyle: {
@@ -150,6 +142,7 @@ const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (token: string) => {
+    console.log('handleLoginSuccess called with token:', token);
     setUserToken(token);
     setIsAuthenticated(true);
     
@@ -175,23 +168,17 @@ const App: React.FC = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      onError={(error) => {
+        console.error('Navigation error:', error);
+      }}
+    >
       <StatusBar barStyle="light-content" backgroundColor="#667eea" />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        {isAuthenticated ? (
-          <Stack.Screen name="Main">
-            {() => <MainTabNavigator />}
-          </Stack.Screen>
-        ) : (
-          <Stack.Screen name="Login">
-            {() => <LoginScreen onLoginSuccess={handleLoginSuccess} />}
-          </Stack.Screen>
-        )}
-      </Stack.Navigator>
+      {isAuthenticated ? (
+        <MainTabNavigator />
+      ) : (
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+      )}
     </NavigationContainer>
   );
 };
