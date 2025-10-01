@@ -1,0 +1,204 @@
+version: '3.8'
+
+services:
+  # 데이터베이스
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - hems_network
+
+  influxdb:
+    image: influxdb:2.7
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${DOCKER_INFLUXDB_INIT_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${DOCKER_INFLUXDB_INIT_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${DOCKER_INFLUXDB_INIT_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${DOCKER_INFLUXDB_INIT_BUCKET}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - hems_network
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - hems_network
+
+  # MQTT Broker (IoT 데이터 수집용)
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - hems_network
+
+  # HEMS 마이크로서비스
+  api_gateway:
+    build: ./services/api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - INFLUXDB_URL=http://influxdb:8086
+      - REDIS_URL=redis://redis:6379
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - hems_network
+
+  user_app:
+    build: ./services/user_app
+    ports:
+      - "8003:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379
+      - INFLUXDB_URL=http://influxdb:8086
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - hems_network
+
+  ai_optimization:
+    build: ./services/ai_optimization
+    ports:
+      - "8004:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - INFLUXDB_URL=http://influxdb:8086
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - hems_network
+
+  iot_collector:
+    build: ./services/iot_collector
+    ports:
+      - "8006:8000"
+    environment:
+      - NODE_ENV=development
+      - INFLUXDB_URL=http://influxdb:8086
+      - REDIS_URL=redis://redis:6379
+      - MQTT_BROKER=mqtt://mosquitto:1883
+    depends_on:
+      influxdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - hems_network
+
+  incentive_mgmt:
+    build: ./services/incentive_mgmt
+    ports:
+      - "8005:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - hems_network
+
+  bems_connector:
+    build: ./services/bems_connector
+    ports:
+      - "8009:8000"
+    environment:
+      - NODE_ENV=development
+      - BEMS_API_URL=http://host.docker.internal:8080
+      - SMART_ENERGY_API_URL=http://host.docker.internal:8000
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - hems_network
+
+  # 모니터링
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - hems_network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - hems_network
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  redis_data:
+  grafana_data:
+
+networks:
+  hems_network:
+    driver: bridge
